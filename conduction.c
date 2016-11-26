@@ -1,6 +1,7 @@
 // 2D, Transient Conduction Solver for Hackaday 1Kb challenge.
 
 #include <iostream>
+#include <string>
 using namespace std;
 
 int main(){
@@ -20,15 +21,31 @@ int main(){
     cout << T[12][13] << endl;
 
     for (int t=0; t<200; t++){
-        /* T_old[i][j] = T[i][j]; */
+
+        // Please optimize this
+        /* memcpy(T_old, T, sizeof (int) * 28 * 28); */
+        for (int i=1; i<28; i++){
+            for (int j=1; j<28; j++){
+                T_old[i][j] = T[i][j];
+            }
+        }
+
         for (int i=1; i<28; i++){
             for (int j=1; j<28; j++){
                 T[i][j] = ((alpha * dt) / (dx_squared)) * (T_old[i+1][j] + T_old[i-1][j] + T_old[i][j-1] + T_old[i][j+1]) - (4 * alpha * dt)/(dx_squared) * T_old[i][j] + T_old[i][j];
-                cout << T[i][j];
-                cout << ", " ;
+
             }
-            cout << endl;
         }
     }
+
+    // just for debugging
+    for (int i=1; i<28; i++){
+        for (int j=1; j<28; j++){
+            cout << T[i][j]<< ", " ;
+        }
+        cout << endl;
+    }
+
+
     return 0;
 }
