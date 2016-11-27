@@ -1,8 +1,10 @@
 // 2D, Transient Conduction Solver for Hackaday 1Kb challenge.
 
+#ifndef __AVR
 #include <iostream>
 #include <iomanip>
 using namespace std;
+#endif
 
 
 int main(){
@@ -37,6 +39,7 @@ int main(){
         T[N-1][i] = 50.0;
     }
 
+#ifndef __AVR
     cout << endl << "Initial conditions" << endl;
     cout << setprecision(2);
     for (int i=0; i<N; i++){
@@ -45,6 +48,7 @@ int main(){
         }
         cout << endl;
     }
+#endif
 
 
     for (int t=0; t<tmax; t++){
@@ -66,6 +70,7 @@ int main(){
     }
 
 
+#ifndef __AVR
     // display matrix just for debugging
     cout << endl << "Final conditions" << endl;
     for (int i=0; i<N; i++){
@@ -74,6 +79,7 @@ int main(){
         }
         cout << endl;
     }
+#endif
 
     return 0;
 }
