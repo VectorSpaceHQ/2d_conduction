@@ -50,8 +50,8 @@ int main(){
     for (int t=0; t<tmax; t++){
 
         // Please optimize this
-        for (int i=0; i<=N; i++){
-            for (int j=0; j<=N; j++){
+        for (int i=0; i<N; i++){
+            for (int j=0; j<N; j++){
                 T_old[i][j] = T[i][j];
             }
         }
