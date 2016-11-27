@@ -11,7 +11,7 @@ int main(){
     int N = 28;
     int tmax = 1000;
 
-    float T[N][N];
+    volatile float T[N][N];
     float T_old[N][N];
     float alpha = 1.0E-2;
     // time step size
