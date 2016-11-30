@@ -1,11 +1,11 @@
 
 all: conduction conduction-avr
 
-conduction:
-	g++ conduction.c -o conduction
+conduction: conduction.c
+	gcc conduction.c -std=gnu99 -o  conduction
 
-conduction-avr:
-	avr-g++ -Os -mmcu=atmega328p -ffunction-sections -fdata-sections -Wl,--gc-sections -Wl,-Map=conduction.map conduction.c -o conduction-avr
+conduction-avr: conduction.c
+	avr-gcc -std=gnu99 -Os -mmcu=atmega328p -ffunction-sections -fdata-sections -Wl,--gc-sections -Wl,-Map=conduction.map conduction.c -o conduction-avr
 	avr-size conduction-avr
 
 clean:
