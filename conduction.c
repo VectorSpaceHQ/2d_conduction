@@ -14,7 +14,7 @@
 
 #ifndef __AVR
 
-void printT(uint8_t T[Nx][Ny])
+void printT(volatile uint8_t T[Nx][Ny])
 {
     for (uint8_t y = 0; y < Ny; y++)
     {
@@ -32,14 +32,14 @@ void printT(uint8_t T[Nx][Ny])
 
 int main(void)
 {
-    uint8_t T[Nx][Ny];
+    volatile uint8_t T[Nx][Ny];
 
     dbg("2D Conduction\n");
 
-    uint8_t Ttop = 50;
-    uint8_t Tleft = 50;
-    uint8_t Tbottom = 40;
-    uint8_t Tright = 50;
+    uint8_t Ttop = 90;
+    uint8_t Tleft = 90;
+    uint8_t Tbottom = 80;
+    uint8_t Tright = 90;
 
     uint8_t Tavg = (Ttop + Tleft + Tbottom + Tright) >> 2;
 
@@ -79,7 +79,8 @@ int main(void)
         {
             for (uint8_t x = 1; x < Nx - 1; x++)
             {
-                T[x][y] = (T[x - 1][y] + T[x + 1][y] + T[x][y - 1] + T[x][y + 1]) >> 2;
+                uint16_t sum = (uint16_t)(T[x - 1][y] + T[x + 1][y] + T[x][y - 1] + T[x][y + 1]) >> 2;
+                T[x][y] = (uint8_t) sum;
             }
         }
     }
