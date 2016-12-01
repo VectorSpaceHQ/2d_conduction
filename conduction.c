@@ -9,21 +9,23 @@
 
 #include <stdint.h>
 
-#define Nx  32
-#define Ny  24
+#include "fixed.h"
 
-#define Nx  5
-#define Ny  5
+//#define Nx  32
+//#define Ny  24
+
+#define Nx  8
+#define Ny  8
 
 #ifndef __AVR
 
-void printT(volatile uint8_t T[Nx][Ny])
+void printT(volatile fixed_t T[Nx][Ny])
 {
-    for (uint8_t y = 0; y < Ny; y++)
+    for (fixed_t y = 0; y < Ny; y++)
     {
-        for (uint8_t x = 0; x < Nx; x++)
+        for (fixed_t x = 0; x < Nx; x++)
         {
-            dbg("%d ", T[x][y]);
+            dbg("%07.4f ", fixed_to_float(T[x][y]));
         }
         dbg("\n");
     }
@@ -55,26 +57,26 @@ void printT(volatile uint8_t T[Nx][Ny])
 /*     int color[3] = {reds[index], blues[index], greens[index]}; */
 /* } */
 
+volatile fixed_t T[Nx][Ny];
+volatile fixed_t T_old[Nx][Ny];
 
 int main(){
-    volatile uint8_t T[Nx][Ny];
-    volatile uint8_t T_old[Nx][Ny];
 
     dbg("2D Conduction\n");
 
-    uint32_t Ttop = 90;
-    uint32_t Tleft = 90;
-    uint32_t Tbottom = 80;
-    uint32_t Tright = 90;
-    uint32_t Tavg = (Ttop + Tleft + Tbottom + Tright) >> 2;
+    fixed_t Ttop = fixed_from_int(1);
+    fixed_t Tleft = fixed_from_int(1);
+    fixed_t Tbottom = fixed_from_real(0.5);
+    fixed_t Tright = fixed_from_int(1);
+    fixed_t Tavg = fixed_div(Ttop + Tleft + Tbottom + Tright, fixed_from_int(4));
 
     // thermal diffusivity (m^2/s)
     // .001 * 1000
-    uint8_t alpha = 1;
+    fixed_t alpha = fixed_from_int(1);
     // time step size
-    uint8_t dt = 1;
+    fixed_t dt = fixed_from_int(1);
     // distance between LEDs (m), squared
-    uint8_t dx_squared = 10;
+    fixed_t dx_squared = fixed_from_int(10);
 
 
     // initial conditions
@@ -109,24 +111,35 @@ int main(){
     printT(T);
 
 
+    // Only need to calculate this once
+    fixed_t term1 = fixed_div(fixed_mul(alpha, dt), dx_squared);
+
     // Time loop
-    for (uint16_t n=0; n < 100; n++){
+    for (uint16_t n=0; n < 10000; n++){
 
         // Store temperature array as old values for use in explicit method
-        for (uint8_t i=0; i < Nx - 1; i++){
-            for (uint8_t j=0; j < Ny - 1; j++){
+        for (uint8_t i=0; i < Nx; i++){
+            for (uint8_t j=0; j < Ny; j++){
                 T_old[i][j] = T[i][j];
             }
+        }
+
+        if ((n % 100) == 0)
+        {
+            dbg("\nInteration %d\n", n);
+            printT(T);
         }
 
         // Euler explicit method
         for (uint8_t j=1; j < Ny - 1; j++){
             for (uint8_t i=1; i < Nx - 1; i++){
                 /* assign_color(T[i][j], 40.0, 50.0); */
-                uint8_t term1 = ((alpha * dt) / dx_squared);
-                uint8_t term2 = (T_old[i+1][j] + T_old[i-1][j] + T_old[i][j-1] + T_old[i][j+1] - 4*T_old[i][j]) + T_old[i][j];
-                /* dbg("term2= %d\n", term2); */
-                T[i][j] = term1*term2;
+                fixed_t term2 = (T_old[i+1][j] + T_old[i-1][j] + T_old[i][j-1] + T_old[i][j+1] - fixed_mul(fixed_from_int(4), T_old[i][j])) + T_old[i][j];
+
+                T[i][j] = fixed_mul(term1, term2);
+
+//                dbg("Told[%d][%d] = %x\n", i, j, T_old[i][j]);
+//                dbg("%x * %x = %x\n", term1, term2, T[i][j]);
             }
         }
     }
