@@ -9,11 +9,11 @@
 
 #include <stdint.h>
 
-#define Nx  32
-#define Ny  24
+//#define Nx  32
+//#define Ny  24
 
-#define Nx  5
-#define Ny  5
+#define Nx  8
+#define Ny  8
 
 #ifndef __AVR
 
@@ -113,8 +113,8 @@ int main(){
     for (uint16_t n=0; n < 100; n++){
 
         // Store temperature array as old values for use in explicit method
-        for (uint8_t i=0; i < Nx - 1; i++){
-            for (uint8_t j=0; j < Ny - 1; j++){
+        for (uint8_t i=0; i < Nx; i++){
+            for (uint8_t j=0; j < Ny; j++){
                 T_old[i][j] = T[i][j];
             }
         }
@@ -123,7 +123,7 @@ int main(){
         for (uint8_t j=1; j < Ny - 1; j++){
             for (uint8_t i=1; i < Nx - 1; i++){
                 /* assign_color(T[i][j], 40.0, 50.0); */
-                uint8_t term1 = ((alpha * dt) / dx_squared);
+                uint8_t term1 = ((alpha * dt) / dx_squared); // <--- This evaluates to 0
                 uint8_t term2 = (T_old[i+1][j] + T_old[i-1][j] + T_old[i][j-1] + T_old[i][j+1] - 4*T_old[i][j]) + T_old[i][j];
                 /* dbg("term2= %d\n", term2); */
                 T[i][j] = term1*term2;
