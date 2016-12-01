@@ -9,3 +9,8 @@ green = -76*T^3 - 577*T^2 + 598*T + 68
 blue = 612*T^3 - 1345*T^2 + 586*T + 184
 
 Floating point operations require additional functions, whereas large arrays are stored in memory. It is therefore better (from a program space perspective) to store 768 color values in arrays than it is to use three simple polynomial expressions to calculate these numbers.
+
+# Code Reduction Ideas
+Use __attribute__((OS_main)) on main
+Use interrupt vector location in program memory
+Hand optimise into assembly
