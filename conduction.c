@@ -26,9 +26,9 @@ void assign_color(float T, float Tmin, float Tmax){
     }
 
 
-/* #ifndef __AVR */
-/*     cout << ratio << ", " << index << endl; */
-/* #endif */
+#ifndef __AVR
+    cout << ratio << ", " << index << endl;
+#endif
 
     int color[3] = {reds[index], blues[index], greens[index]};
 }
@@ -92,7 +92,7 @@ int main(){
                 T[i][j] = ((alpha * dt) / dx_squared)
                     * (T_old[i+1][j] + T_old[i-1][j] + T_old[i][j-1] + T_old[i][j+1] - 4*T_old[i][j])
                     + T_old[i][j];
-                assign_color(T[i][j], 40.0, 50.0);
+                /* assign_color(T[i][j], 40.0, 50.0); */
             }
         }
     }
