@@ -34,6 +34,7 @@
 volatile fixed_t T[Nx][Ny];
 volatile fixed_t T_old[Nx][Ny];
 
+__attribute__ (( OS_main ))
 int main()
 {
     spi_master_init();
