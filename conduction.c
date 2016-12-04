@@ -4,6 +4,7 @@
 
 #include "fixed.h"
 #include "spi.h"
+#include "adc.h"
 
 #define Nx  8
 #define Ny  8
@@ -37,10 +38,10 @@ int main()
 {
     spi_master_init();
 
-    fixed_t Ttop = fixed_from_int(1);
-    fixed_t Tleft = fixed_from_int(1);
-    fixed_t Tbottom = fixed_from_real(0.5);
-    fixed_t Tright = fixed_from_int(1);
+    fixed_t Ttop = adc_read(0);
+    fixed_t Tleft = adc_read(1);
+    fixed_t Tbottom = adc_read(2);
+    fixed_t Tright = adc_read(3);
     fixed_t Tavg = fixed_div(Ttop + Tleft + Tbottom + Tright, fixed_from_int(4));
 
     // thermal diffusivity (m^2/s)
