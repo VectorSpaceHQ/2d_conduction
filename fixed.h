@@ -11,4 +11,3 @@ typedef int32_t dfixed_t;
 #define fixed_mul(x,y)      ((fixed_t)(((dfixed_t)(x) * (dfixed_t)(y)) >> FIXED_BITS))
 #define fixed_div(x,y)      ((fixed_t)(((dfixed_t)(x) << FIXED_BITS) / (dfixed_t)(y)))
 #define fixed_to_float(x)   ((float)(((x) >> FIXED_BITS) + ((float)((x) & 0x03FF) / 1024.0)))
-//#define fixed_to_float(x)   ((float)(256.0))
