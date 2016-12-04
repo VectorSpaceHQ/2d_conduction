@@ -10,6 +10,7 @@ CFLAGS += -Wl,-Map=$(TARGET).map
 CFLAGS += -flto
 CFLAGS += -mrelax
 CFLAGS += -lm
+CFLAGS += -nostartfiles
 
 all: $(TARGET)
 
@@ -17,7 +18,7 @@ conduction.c: fixed.h spi.h adc.h
 spi.c: spi.h
 adc.c: adc.h
 
-$(TARGET): conduction.c spi.c adc.c
+$(TARGET): conduction.c spi.c adc.c gcrt1.S
 	$(CC) -mmcu=$(DEVICE) $(CFLAGS) $^ -o $(TARGET)
 	avr-size $(TARGET)
 
