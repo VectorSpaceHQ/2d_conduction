@@ -7,6 +7,8 @@ CFLAGS += -std=gnu99
 CFLAGS += -Os
 CFLAGS += -ffunction-sections -fdata-sections -Wl,--gc-sections
 CFLAGS += -Wl,-Map=$(TARGET).map
+CFLAGS += -flto
+CFLAGS += -mrelax
 CFLAGS += -lm
 
 all: $(TARGET)
