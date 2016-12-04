@@ -1,28 +1,22 @@
 TARGET = conduction
-AVR_TARGET = $(TARGET)-avr
+DEVICE = atmega328p
 
-AVR_DEVICE = atmega328p
-
-AVR_CC = avr-gcc
+CC = avr-gcc
 
 CFLAGS += -std=gnu99
 CFLAGS += -Os
+CFLAGS += -ffunction-sections -fdata-sections -Wl,--gc-sections
+CFLAGS += -Wl,-Map=$(TARGET).map
 
-AVR_CFLAGS += $(CFLAGS)
-AVR_CFLAGS += -ffunction-sections -fdata-sections -Wl,--gc-sections
-AVR_CFLAGS += -Wl,-Map=$(AVR_TARGET).map
+all: $(TARGET)
 
-all: $(TARGET) $(AVR_TARGET)
+conduction.c: fixed.h spi.h
+spi.c: spi.h
 
-conduction.c: fixed.h
-
-$(TARGET): conduction.c
-	$(CC) $(CFLAGS) conduction.c -o $(TARGET)
-
-$(AVR_TARGET): conduction.c
-	$(AVR_CC) -mmcu=$(AVR_DEVICE) $(AVR_CFLAGS) conduction.c -o $(AVR_TARGET)
-	avr-size $(AVR_TARGET)
+$(TARGET): conduction.c spi.c
+	$(CC) -mmcu=$(DEVICE) $(CFLAGS) $^ -o $(TARGET)
+	avr-size $(TARGET)
 
 .PHONY: clean
 clean:
-	rm -f $(TARGET) $(AVR_TARGET) $(AVR_TARGET).map
+	rm -f *.o $(TARGET) $(TARGET).map

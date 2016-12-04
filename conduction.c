@@ -1,39 +1,12 @@
 // 2D, Transient Conduction Solver for Hackaday 1Kb challenge.
 
-#ifndef __AVR
-#include <stdio.h>
-#define dbg(...)  fprintf(stderr, __VA_ARGS__)
-#else
-#define dbg(...)
-#endif
-
 #include <stdint.h>
 
 #include "fixed.h"
-
-//#define Nx  32
-//#define Ny  24
+#include "spi.h"
 
 #define Nx  8
 #define Ny  8
-
-#ifndef __AVR
-
-void printT(volatile fixed_t T[Nx][Ny])
-{
-    for (fixed_t y = 0; y < Ny; y++)
-    {
-        for (fixed_t x = 0; x < Nx; x++)
-        {
-            dbg("%07.4f ", fixed_to_float(T[x][y]));
-        }
-        dbg("\n");
-    }
-}
-
-#else
-#define printT(x)
-#endif
 
 /* void assign_color(float T, float Tmin, float Tmax){ */
 /*     // Assign a color to a given temperature using the coolwarm colormap. */
@@ -60,9 +33,9 @@ void printT(volatile fixed_t T[Nx][Ny])
 volatile fixed_t T[Nx][Ny];
 volatile fixed_t T_old[Nx][Ny];
 
-int main(){
-
-    dbg("2D Conduction\n");
+int main()
+{
+    spi_master_init();
 
     fixed_t Ttop = fixed_from_int(1);
     fixed_t Tleft = fixed_from_int(1);
@@ -78,74 +51,51 @@ int main(){
     // distance between LEDs (m), squared
     fixed_t dx_squared = fixed_from_int(10);
 
-
     // initial conditions
-    for (uint8_t y = 0; y < Ny; y++)
-    {
-        for (uint8_t x = 0; x < Nx; x++)
-        {
-            if (x == 0)
-            {
+    for (uint8_t y = 0; y < Ny; y++) {
+        for (uint8_t x = 0; x < Nx; x++) {
+            if (x == 0) {
                 T[x][y] = Tleft;
             }
-            else if (x == Nx - 1)
-            {
+            else if (x == Nx - 1) {
                 T[x][y] = Tright;
             }
-            else if (y == 0)
-            {
+            else if (y == 0) {
                 T[x][y] = Ttop;
             }
-            else if (y == Ny - 1)
-            {
+            else if (y == Ny - 1) {
                 T[x][y] = Tbottom;
             }
-            else
-            {
+            else {
                 T[x][y] = Tavg;
             }
         }
     }
 
-    dbg("\nInitial state\n");
-    printT(T);
-
-
-    // Only need to calculate this once
     fixed_t term1 = fixed_div(fixed_mul(alpha, dt), dx_squared);
 
     // Time loop
-    for (uint16_t n=0; n < 10000; n++){
+    for (uint16_t n=0; n < 10000; n++) {
 
         // Store temperature array as old values for use in explicit method
-        for (uint8_t i=0; i < Nx; i++){
-            for (uint8_t j=0; j < Ny; j++){
+        for (uint8_t i=0; i < Nx; i++) {
+            for (uint8_t j=0; j < Ny; j++) {
                 T_old[i][j] = T[i][j];
             }
         }
 
-        if ((n % 100) == 0)
-        {
-            dbg("\nInteration %d\n", n);
-            printT(T);
-        }
-
         // Euler explicit method
-        for (uint8_t j=1; j < Ny - 1; j++){
-            for (uint8_t i=1; i < Nx - 1; i++){
+        for (uint8_t j=1; j < Ny - 1; j++) {
+            for (uint8_t i=1; i < Nx - 1; i++) {
                 /* assign_color(T[i][j], 40.0, 50.0); */
                 fixed_t term2 = (T_old[i+1][j] + T_old[i-1][j] + T_old[i][j-1] + T_old[i][j+1] - fixed_mul(fixed_from_int(4), T_old[i][j])) + T_old[i][j];
 
                 T[i][j] = fixed_mul(term1, term2);
-
-//                dbg("Told[%d][%d] = %x\n", i, j, T_old[i][j]);
-//                dbg("%x * %x = %x\n", term1, term2, T[i][j]);
             }
         }
-    }
 
-    dbg("\nFinal state\n");
-    printT(T);
+        spi_transfer(0x00);
+    }
 
     return 0;
 }
