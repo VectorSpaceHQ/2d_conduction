@@ -42,15 +42,7 @@ int main()
     fixed_t Tleft = adc_read(1);
     fixed_t Tbottom = adc_read(2);
     fixed_t Tright = adc_read(3);
-    fixed_t Tavg = fixed_div(Ttop + Tleft + Tbottom + Tright, fixed_from_int(4));
-
-    // thermal diffusivity (m^2/s)
-    // .001 * 1000
-    fixed_t alpha = fixed_from_int(1);
-    // time step size
-    fixed_t dt = fixed_from_int(1);
-    // distance between LEDs (m), squared
-    fixed_t dx_squared = fixed_from_int(10);
+    fixed_t Tavg = (Ttop + Tleft + Tbottom + Tright >> 2);
 
     // initial conditions
     for (uint8_t y = 0; y < Ny; y++) {
@@ -73,7 +65,19 @@ int main()
         }
     }
 
-    fixed_t term1 = fixed_div(fixed_mul(alpha, dt), dx_squared);
+    // alpha is thermal diffusivity (m^2/s)
+    // alpha = .001 * 1000
+    //
+    // dt is time step size (s)
+    // dt = 1
+    //
+    // dx is distance between LEDs (m),
+    // dx = 10
+    //
+    // Tao = (alpha * dt) / (dx ^ 2)
+    // tao = (1 * 1) / (10 ^2)
+    // tao = 0.01
+    fixed_t tao = fixed_from_real(0.01);
 
     // Time loop
     for (uint16_t n=0; n < 10000; n++) {
@@ -89,9 +93,13 @@ int main()
         for (uint8_t j=1; j < Ny - 1; j++) {
             for (uint8_t i=1; i < Nx - 1; i++) {
                 /* assign_color(T[i][j], 40.0, 50.0); */
-                fixed_t term2 = (T_old[i+1][j] + T_old[i-1][j] + T_old[i][j-1] + T_old[i][j+1] - fixed_mul(fixed_from_int(4), T_old[i][j])) + T_old[i][j];
+                fixed_t term =     (
+                                            T_old[i+1][j] + T_old[i-1][j] + T_old[i][j-1] + T_old[i][j+1]
+                                        -   (T_old[i][j] << 2)
+                                    )
+                                +   T_old[i][j];
 
-                T[i][j] = fixed_mul(term1, term2);
+                T[i][j] = fixed_mul(tao, term);
             }
         }
 
