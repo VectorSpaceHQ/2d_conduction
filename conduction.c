@@ -5,6 +5,7 @@
 #include "fixed.h"
 #include "spi.h"
 #include "adc.h"
+#include "rgb_matrix.h"
 
 #define Nx  8
 #define Ny  8
@@ -104,7 +105,12 @@ int main()
             }
         }
 
-        spi_transfer(0x00);
+        rgb_matrix_start_frame();
+        for (uint16_t i = 0; i < 728; i++)
+        {
+            rgb_matrix_send_pixel(i & 0x00FF, (i & 0x0FF0) >> 4, (i & 0xFF00) >> 8);
+        }
+        rgb_matrix_end_frame();
     }
 
     return 0;
