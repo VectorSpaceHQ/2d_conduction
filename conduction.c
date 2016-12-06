@@ -7,8 +7,8 @@
 #include "adc.h"
 #include "rgb_matrix.h"
 
-#define Nx  8
-#define Ny  8
+#define Nx  24
+#define Ny  24
 
 /* void assign_color(float T, float Tmin, float Tmax){ */
 /*     // Assign a color to a given temperature using the coolwarm colormap. */
@@ -33,7 +33,7 @@
 /* } */
 
 volatile fixed_t T[Nx][Ny];
-volatile fixed_t T_old[Nx][Ny];
+volatile fixed_t T_old[Nx];
 
 __attribute__ (( OS_main ))
 int main()
@@ -85,24 +85,27 @@ int main()
     for (uint16_t n=0; n < 10000; n++) {
 
         // Store temperature array as old values for use in explicit method
-        for (uint8_t i=0; i < Nx; i++) {
-            for (uint8_t j=0; j < Ny; j++) {
-                T_old[i][j] = T[i][j];
-            }
+        for (uint8_t i=1; i < Nx - 1; i++) {
+            T_old[i] = T[i][0];
         }
+        T_old[0] = T[0][1];
+        T_old[Nx -1] = T[Nx - 1][1];
 
         // Euler explicit method
         for (uint8_t j=1; j < Ny - 1; j++) {
             for (uint8_t i=1; i < Nx - 1; i++) {
                 /* assign_color(T[i][j], 40.0, 50.0); */
                 fixed_t term =     (
-                                            T_old[i+1][j] + T_old[i-1][j] + T_old[i][j-1] + T_old[i][j+1]
-                                        -   (T_old[i][j] << 2)
+                                            T[i+1][j] + T_old[i-1] + T_old[i] + T[i][j+1]
+                                        -   (T[i][j] << 2)
                                     )
-                                +   T_old[i][j];
-
+                                +   T[i][j];
+                T_old[i] = T[i][j];
                 T[i][j] = fixed_mul(tao, term);
             }
+
+            T_old[0] = T[0][j + 1];
+            T_old[Nx - 1] = T[Nx - 1][j + 1];
         }
 
         rgb_matrix_start_frame();
