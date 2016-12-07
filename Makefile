@@ -23,6 +23,10 @@ rgb_matrix.c: rgb_matrix.h
 $(TARGET): conduction.c spi.c adc.c rgb_matrix.c gcrt1.S
 	$(CC) -mmcu=$(DEVICE) $(CFLAGS) $^ -o $(TARGET)
 	avr-size $(TARGET)
+	avr-objcopy -O ihex -R .eeprom $(TARGET) $(TARGET).hex
+
+load: $(TARGET)
+	avrdude -c arduino -p m328p -P /dev/ttyUSB0 -U flash:w:$(TARGET).hex:i
 
 .PHONY: clean
 clean:

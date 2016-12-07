@@ -7,7 +7,7 @@
 #include "adc.h"
 #include "rgb_matrix.h"
 
-#define Nx  24
+#define Nx  32
 #define Ny  24
 
 /* void assign_color(float T, float Tmin, float Tmax){ */
@@ -35,16 +35,13 @@
 volatile fixed_t T[Nx][Ny];
 volatile fixed_t T_old[Nx];
 
-__attribute__ (( OS_main ))
-int main()
+void update_boundary(void)
 {
-    spi_master_init();
-
     fixed_t Ttop = adc_read(0);
     fixed_t Tleft = adc_read(1);
     fixed_t Tbottom = adc_read(2);
     fixed_t Tright = adc_read(3);
-    fixed_t Tavg = (Ttop + Tleft + Tbottom + Tright >> 2);
+    fixed_t Tavg = (Ttop + Tleft + Tbottom + Tright) >> 2;
 
     // initial conditions
     for (uint8_t y = 0; y < Ny; y++) {
@@ -62,13 +59,20 @@ int main()
                 T[x][y] = Tbottom;
             }
             else {
-                T[x][y] = Tavg;
+                //T[x][y] = Tavg;
             }
         }
     }
 
+}
+
+__attribute__ (( OS_main ))
+int main()
+{
+    spi_master_init();
+
     // alpha is thermal diffusivity (m^2/s)
-    // alpha = .001 * 1000
+    // alpha = 0.001 * 1000
     //
     // dt is time step size (s)
     // dt = 1
@@ -82,7 +86,10 @@ int main()
     fixed_t tao = fixed_from_real(0.01);
 
     // Time loop
-    for (uint16_t n=0; n < 10000; n++) {
+//    for (uint16_t n=0; n < 10000; n++) {
+    while(1) {
+
+        update_boundary();
 
         // Store temperature array as old values for use in explicit method
         for (uint8_t i=1; i < Nx - 1; i++) {
@@ -95,13 +102,13 @@ int main()
         for (uint8_t j=1; j < Ny - 1; j++) {
             for (uint8_t i=1; i < Nx - 1; i++) {
                 /* assign_color(T[i][j], 40.0, 50.0); */
-                fixed_t term =     (
+                fixed_t term =     fixed_mul(tao,
                                             T[i+1][j] + T_old[i-1] + T_old[i] + T[i][j+1]
                                         -   (T[i][j] << 2)
                                     )
                                 +   T[i][j];
                 T_old[i] = T[i][j];
-                T[i][j] = fixed_mul(tao, term);
+                T[i][j] = term;
             }
 
             T_old[0] = T[0][j + 1];
@@ -111,6 +118,8 @@ int main()
         rgb_matrix_start_frame();
         for (uint16_t i = 0; i < 728; i++)
         {
+	    // convert to color
+
             rgb_matrix_send_pixel(i & 0x00FF, (i & 0x0FF0) >> 4, (i & 0xFF00) >> 8);
         }
         rgb_matrix_end_frame();
