@@ -117,14 +117,26 @@ int main()
 
         rgb_matrix_start_frame();
 
-        for (uint8_t k = 0; k < 12; k++) {
-            for (uint8_t j = 0; j < 8; j++) {
-                for (uint8_t i = 0; i < 8; i++) {
-                  // convert to color
-                  rgb_matrix_send_pixel(0, 0, 0);
-                }
-            }
-        }
+        /* uint8_t iforward = -1; */
+        /* uint8_t kforward = -1; */
+        /* uint8_t column = 0; */
+        /* for (uint8_t k = 0; k < 12; k++) { */
+        /*   if (k % 4 == 0){ */
+        /*     kforward = kforward * -1; */
+        /*   } */
+        /*   for (uint8_t j = 0; j < 8; j++) { */
+        /*     iforward = iforward * -1; */
+        /*     for (uint8_t i = 0; i < 8; i++) { */
+        /*       // convert to color */
+        /*       if (kforward == -1){ */
+        /*         i = 32-i */
+        /*       } */
+        /*       xyz = T(i * iforward * (column+1), j); */
+        /*       rgb_matrix_send_pixel(0, 0, 0); */
+        /*     } */
+        /*   } */
+        /*   column = column + kforward; */
+        /* } */
         rgb_matrix_end_frame();
     }
 
