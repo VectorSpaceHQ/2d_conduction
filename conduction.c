@@ -1,6 +1,7 @@
 // 2D, Transient Conduction Solver for Hackaday 1Kb challenge.
 
 #include <stdint.h>
+#include <limits.h>
 
 #include "fixed.h"
 #include "spi.h"
@@ -10,38 +11,27 @@
 #define Nx  32
 #define Ny  24
 
-/* void assign_color(float T, float Tmin, float Tmax){ */
-/*     // Assign a color to a given temperature using the coolwarm colormap. */
-/*     // http://www.kennethmoreland.com/color-maps/ */
+void assign_color( int16_t T, int16_t Tmax, int16_t Tmin, uint8_t* R, uint8_t* G, uint8_t* B ){ 
+    uint8_t index = (T - Tmin) * 34 / (Tmax - Tmin);
+    unsigned int reds[34] = {59,68,77,87,98,108,119,130,141,152,163,174,184,194,204,213,221,229,236,241,245,247,247,247,244,241,236,229,222,213,203,192,180};
+    unsigned int greens[34] = {76, 90, 104, 117, 130, 142, 154, 165, 176, 185, 194, 201, 208, 213, 217, 219, 221, 216, 211, 204, 196, 187, 177, 166, 154, 141, 127, 112, 96, 80, 62, 40, 4};
+    unsigned int blues[34] = {192, 204, 215, 225, 234, 241, 247, 251, 254, 255, 255, 253, 249, 244, 238, 230, 221, 209, 197, 185, 173, 160, 148, 135, 123, 111, 99, 88, 77, 66, 56, 47, 38};
 
-/*     float scale[34] = {0, 0.03125, 0.0625, 0.09375, 0.125, 0.15625, 0.1875, 0.21875, 0.25, 0.28125, 0.3125, 0.34375, 0.375, 0.40625, 0.4375, 0.46875, 0.5, 0.53125, 0.5625, 0.59375, 0.625, 0.65625, 0.6875, 0.71875, 0.75, 0.78125, 0.8125, 0.84375, 0.875, 0.90625, 0.9375, 0.96875, 1}; */
-/*     int reds[34] = {59,68,77,87,98,108,119,130,141,152,163,174,184,194,204,213,221,229,236,241,245,247,247,247,244,241,236,229,222,213,203,192,180}; */
-/*     int greens[34] = {76, 90, 104, 117, 130, 142, 154, 165, 176, 185, 194, 201, 208, 213, 217, 219, 221, 216, 211, 204, 196, 187, 177, 166, 154, 141, 127, 112, 96, 80, 62, 40, 4}; */
-/*     int blues[34] = {192, 204, 215, 225, 234, 241, 247, 251, 254, 255, 255, 253, 249, 244, 238, 230, 221, 209, 197, 185, 173, 160, 148, 135, 123, 111, 99, 88, 77, 66, 56, 47, 38}; */
+    *R = reds[index];
+    *G = greens[index];
+    *B = blues[index];
+} 
 
-/*     int index = 0; */
-/*     float ratio = (T - Tmin) / (Tmax - Tmin); */
-/*     for (int i=0; i<34; i++){ */
-/*         if (ratio < scale[i]){ */
-/*             index = i; */
-/*             break; */
-/*         } */
-/*     } */
-
-
-/*     int color[3] = {reds[index], blues[index], greens[index]}; */
-/* } */
-
-volatile fixed_t T[Nx][Ny];
-volatile fixed_t T_old[Nx];
+volatile int16_t T[Nx][Ny];
+volatile int16_t T_old[Nx];
 
 void update_boundary(void)
 {
-    fixed_t Ttop = adc_read(0);
-    fixed_t Tleft = adc_read(1);
-    fixed_t Tbottom = adc_read(2);
-    fixed_t Tright = adc_read(3);
-    fixed_t Tavg = (Ttop + Tleft + Tbottom + Tright) >> 2;
+    int16_t Ttop = adc_read(0);
+    int16_t Tleft = adc_read(1);
+    int16_t Tbottom = adc_read(2);
+    int16_t Tright = adc_read(3);
+    int16_t Tavg = (Ttop + Tleft + Tbottom + Tright) >> 2;
 
     // initial conditions
     for (uint8_t y = 0; y < Ny; y++) {
@@ -83,10 +73,10 @@ int main()
     // Tao = (alpha * dt) / (dx ^ 2)
     // tao = (1 * 1) / (10 ^2)
     // tao = 0.01
-    fixed_t tao = fixed_from_real(0.01);
+    //fixed_t tao = fixed_from_real(0.01);
 
     // Time loop
-//    for (uint16_t n=0; n < 10000; n++) {
+//    for (int16_t n=0; n < 10000; n++) {
     while(1) {
 
         update_boundary();
@@ -98,17 +88,23 @@ int main()
         T_old[0] = T[0][1];
         T_old[Nx -1] = T[Nx - 1][1];
 
+        int16_t Tmin = INT_MAX;
+        int16_t Tmax = INT_MIN;
         // Euler explicit method
         for (uint8_t j=1; j < Ny - 1; j++) {
             for (uint8_t i=1; i < Nx - 1; i++) {
-                /* assign_color(T[i][j], 40.0, 50.0); */
-                fixed_t term =     fixed_mul(tao,
-                                            T[i+1][j] + T_old[i-1] + T_old[i] + T[i][j+1]
+                int16_t term =  (T[i+1][j] + T_old[i-1] + T_old[i] + T[i][j+1]
                                         -   (T[i][j] << 2)
-                                    )
+                                 ) / 100
                                 +   T[i][j];
                 T_old[i] = T[i][j];
                 T[i][j] = term;
+
+                if( T[i][j] < Tmin )
+                    Tmin = T[i][j];
+
+                if( T[i][j] > Tmax )
+                    Tmax = T[i][j];
             }
 
             T_old[0] = T[0][j + 1];
@@ -116,11 +112,12 @@ int main()
         }
 
         rgb_matrix_start_frame();
-        for (uint16_t i = 0; i < 768; i++)
+        for (int16_t i = 0; i < 768; i++)
         {
 	    // convert to color
-
-            rgb_matrix_send_pixel(0, 0, 0);
+            uint8_t R, G, B;
+            assign_color( T[i], Tmax, Tmin, &R, &G, &B );
+            rgb_matrix_send_pixel(R, G, B);
         }
         rgb_matrix_end_frame();
     }

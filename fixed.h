@@ -11,3 +11,10 @@ typedef int32_t dfixed_t;
 #define fixed_mul(x,y)      ((fixed_t)(((dfixed_t)(x) * (dfixed_t)(y)) >> FIXED_BITS))
 #define fixed_div(x,y)      ((fixed_t)(((dfixed_t)(x) << FIXED_BITS) / (dfixed_t)(y)))
 #define fixed_to_float(x)   ((float)(((x) >> FIXED_BITS) + ((float)((x) & 0x03FF) / 1024.0)))
+
+
+#define dfixed_from_real(x)  ((dfixed_t)((x) * (((fixed_t)1 << FIXED_BITS) + ((x) > 0 ? 0.5 : -0.5))))
+#define dfixed_from_int(x)   ((dfixed_t)(x) << FIXED_BITS)
+#define dfixed_to_int(x)     ((x) >> FIXED_BITS)
+#define dfixed_mul(x,y)      ((fixed_t)(((dfixed_t)(x) * (dfixed_t)(y)) >> FIXED_BITS))
+#define dfixed_div(x,y)      ((fixed_t)(((dfixed_t)(x) << FIXED_BITS) / (dfixed_t)(y)))
