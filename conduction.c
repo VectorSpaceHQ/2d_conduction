@@ -117,25 +117,15 @@ int main()
 
         rgb_matrix_start_frame();
 
-        /* uint8_t iforward = -1; */
-        /* uint8_t kforward = 1; */
-        /* uint8_t column = 0; */
-        // uint8_t row = 1;
-        /* for (uint8_t k = 0; k < 12; k++) { */
-        /*   if (k % 4 == 0){ */
-        /*     kforward = kforward * -1; */
-        //     row += 1;
-        /*   } */
-        /*   for (uint8_t j = 0; j < 8; j++) { */
-        /*     iforward = iforward * -1; */
-        /*     for (uint8_t i = 0; i < 8; i++) { */
-        /*       // convert to color */
-        /*       xyz = T(i * iforward * (column+1), j * row); */
-        /*       rgb_matrix_send_pixel(0, 0, 0); */
-        /*     } */
-        /*   } */
-        /*   column = column + kforward; */
-        /* } */
+        for (uint16_t i = 0; i < 768; i++) {
+            uint8_t x, y;
+            fixed_t temperature;
+
+            rgb_matrix_get_xy_from_num(i, &x, &y);
+            temperature = T[x][y];
+            rgb_matrix_send_pixel(temperature & 0x00FF, temperature & 0x0FF0, temperature & 0xFF00);
+        }
+
         rgb_matrix_end_frame();
     }
 
