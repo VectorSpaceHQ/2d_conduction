@@ -88,7 +88,6 @@ void transfer_colors(volatile fixed_t T[Nx][Ny]){
     }
 }
 
-
 void update_boundary(void)
 {
     fixed_t Ttop = adc_read(0);
@@ -118,6 +117,7 @@ void update_boundary(void)
         }
     }
 }
+
 
 
 __attribute__ (( OS_main ))

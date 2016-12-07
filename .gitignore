@@ -1,3 +1,4 @@
 conduction
 conduction-avr
 *.map
+*.hex
