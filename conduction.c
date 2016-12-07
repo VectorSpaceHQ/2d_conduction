@@ -116,11 +116,11 @@ int main()
         }
 
         rgb_matrix_start_frame();
-        for (uint16_t i = 0; i < 728; i++)
+        for (uint16_t i = 0; i < 768; i++)
         {
 	    // convert to color
 
-            rgb_matrix_send_pixel(i & 0x00FF, (i & 0x0FF0) >> 4, (i & 0xFF00) >> 8);
+            rgb_matrix_send_pixel(0, 0, 0);
         }
         rgb_matrix_end_frame();
     }

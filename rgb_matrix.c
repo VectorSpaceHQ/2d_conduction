@@ -19,8 +19,8 @@ void rgb_matrix_send_pixel(uint8_t r, uint8_t g, uint8_t b)
 
 void rgb_matrix_end_frame(void)
 {
+    spi_transfer(0xFF);
     spi_transfer(0x00);
-    spi_transfer(0xFF);
-    spi_transfer(0xFF);
-    spi_transfer(0xFF);
+    spi_transfer(0x00);
+    spi_transfer(0x00);
 }
