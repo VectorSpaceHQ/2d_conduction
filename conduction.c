@@ -169,7 +169,15 @@ int main()
         }
 
         rgb_matrix_start_frame();
-        transfer_colors(T);
+        for (uint16_t i = 0; i < 768; i++) {
+            uint8_t x, y;
+            fixed_t temperature;
+
+            rgb_matrix_get_xy_from_num(i, &x, &y);
+            temperature = T[x][y];
+            rgb_matrix_send_pixel(temperature & 0x00FF, temperature & 0x0FF0, temperature & 0xFF00);
+        }
+        // transfer_colors(T);
         rgb_matrix_end_frame();
     }
 
