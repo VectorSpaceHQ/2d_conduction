@@ -8,6 +8,7 @@
 #include "spi.h"
 #include "adc.h"
 #include "rgb_matrix.h"
+#include "colormap.h"
 
 #define Nx  32
 #define Ny  24
@@ -95,12 +96,14 @@ int main()
         rgb_matrix_start_frame();
 
         for (uint16_t i = 0; i < Nx * Ny; i++) {
-            uint8_t x, y;
-            fixed_t temperature;
 
+            uint8_t x, y;
             rgb_matrix_get_xy_from_num(i, &x, &y);
-            temperature = T[x][y];
-            rgb_matrix_send_pixel(temperature & 0x00FF, temperature & 0x0FF0, temperature & 0xFF00);
+
+            uint8_t r, g, b;
+            colormap_temperature_to_rgb(T[x][y], &r, &g, &b);
+
+            rgb_matrix_send_pixel(r, g, b);
         }
 
         rgb_matrix_end_frame();
