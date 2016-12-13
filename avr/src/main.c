@@ -12,19 +12,30 @@
 #include "conduction.h"
 
 void update_leds(void);
+void read_temperatures(fixed_t *boundaryT);
 
 __attribute__ (( OS_main ))
 int main()
 {
+    fixed_t boundaryT[4];
+
     spi_master_init();
 
     while(1) {
-        conduction_update_boundary(adc_read(0), adc_read(1), adc_read(2), adc_read(3));
+        read_temperatures(boundaryT);
+        conduction_update_boundary(boundaryT);
         conduction_compute(1);
         update_leds();
     }
 
     return 0;
+}
+
+void read_temperatures(fixed_t *boundaryT)
+{
+    for (uint8_t i = 0; i < 4; i++) {
+        boundaryT[0] = adc_read(i);
+    }
 }
 
 void update_leds(void)

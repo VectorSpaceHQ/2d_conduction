@@ -49,21 +49,21 @@ void conduction_compute(uint8_t cycles)
     }
 }
 
-void conduction_update_boundary(fixed_t Ttop, fixed_t Tleft, fixed_t Tbottom, fixed_t Tright)
+void conduction_update_boundary(fixed_t *boundaryT)
 {
     for (uint8_t y = 0; y < Ny; y++) {
         for (uint8_t x = 0; x < Nx; x++) {
             if (x == 0) {
-                T[x][y] = Tleft;
+                T[x][y] = boundaryT[1];
             }
             else if (x == Nx - 1) {
-                T[x][y] = Tright;
+                T[x][y] = boundaryT[3];
             }
             else if (y == 0) {
-                T[x][y] = Ttop;
+                T[x][y] = boundaryT[0];
             }
             else if (y == Ny - 1) {
-                T[x][y] = Tbottom;
+                T[x][y] = boundaryT[2];
             }
         }
     }
