@@ -12,6 +12,9 @@ CFLAGS += -mrelax
 CFLAGS += -lm
 CFLAGS += -nostartfiles
 CFLAGS += -g3
+CFLAGS += -DNO_VECTORS
+
+INCLUDES += -I startup/common
 
 all: $(TARGET)
 
@@ -20,8 +23,8 @@ spi.c: spi.h
 adc.c: adc.h
 rgb_matrix.c: rgb_matrix.h
 
-$(TARGET): conduction.c spi.c adc.c rgb_matrix.c gcrt1.S
-	$(CC) -mmcu=$(DEVICE) $(CFLAGS) $^ -o $(TARGET)
+$(TARGET): conduction.c spi.c adc.c rgb_matrix.c startup/crt1/gcrt1.S
+	$(CC) -mmcu=$(DEVICE) $(CFLAGS) $(INCLUDES) $^ -o $(TARGET)
 	avr-size $(TARGET)
 	avr-objcopy -O ihex -R .eeprom $(TARGET) $(TARGET).hex
 
