@@ -33,4 +33,4 @@ load: $(TARGET)
 
 .PHONY: clean
 clean:
-	rm -f *.o $(TARGET) $(TARGET).map
+	rm -f *.o $(TARGET) $(TARGET).map $(TARGET).hex
