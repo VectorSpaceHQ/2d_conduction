@@ -18,13 +18,14 @@ INCLUDES += -I startup/common
 
 all: $(TARGET)
 
-main.c: fixed.h spi.h adc.h rgb_matrix.h colormap.h
+main.c: fixed.h spi.h adc.h rgb_matrix.h colormap.h conduction.h
 spi.c: spi.h
 adc.c: adc.h
 rgb_matrix.c: rgb_matrix.h
 colormap.c: colormap.h fixed.h
+conduction.c: conduction.h fixed.h
 
-$(TARGET): main.c spi.c adc.c rgb_matrix.c colormap.c startup/crt1/gcrt1.S
+$(TARGET): main.c spi.c adc.c rgb_matrix.c colormap.c conduction.c startup/crt1/gcrt1.S
 	$(CC) -mmcu=$(DEVICE) $(CFLAGS) $(INCLUDES) $^ -o $(TARGET)
 	avr-size $(TARGET)
 	avr-objcopy -O ihex -R .eeprom $(TARGET) $(TARGET).hex
