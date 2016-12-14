@@ -12,12 +12,12 @@ void colormap_temperature_to_rgb(fixed_t temperature, uint8_t *r, uint8_t *g, ui
     
     uint16_t val = (temperature & 0x03FF) >> 1;
 
-    if (val < 255) {
+    if (val < 256) {
         *b = 255 - val;
         *r = 0;
     } else {
         *b = 0;
-        *r = val - 255;
+        *r = val - 256;
     }
 
     *g = 255 - *r - *b;
