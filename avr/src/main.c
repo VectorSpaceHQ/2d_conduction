@@ -10,6 +10,7 @@
 #include "rgb_matrix.h"
 #include "colormap.h"
 #include "conduction.h"
+#include "timer.h"
 
 void update_leds(void);
 void read_temperatures(fixed_t *boundaryT);
@@ -20,12 +21,17 @@ int main()
     fixed_t boundaryT[4];
 
     spi_master_init();
+    timer_start();
 
     while(1) {
+        timer_clear();
+
         read_temperatures(boundaryT);
         conduction_update_boundary(boundaryT);
         conduction_compute(1);
         update_leds();
+
+        while(timer_get_ticks() < (TIMER_TICKS_PER_SEC / 10));
     }
 
     return 0;
