@@ -11,6 +11,7 @@
 #include "colormap.h"
 #include "conduction.h"
 #include "timer.h"
+#include "uart.h"
 
 void update_leds(void);
 void read_temperatures(fixed_t *boundaryT);
@@ -40,7 +41,7 @@ int main()
 void read_temperatures(fixed_t *boundaryT)
 {
     for (uint8_t i = 0; i < 6; i++) {
-        boundaryT[i] = adc_read(i);
+        boundaryT[i] = ((adc_read(i) - 400) << 2) ;
     }
 }
 

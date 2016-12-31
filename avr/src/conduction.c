@@ -55,22 +55,22 @@ void conduction_update_boundary(fixed_t *boundaryT)
     for (uint8_t y = 0; y < Ny; y++) {
         for (uint8_t x = 0; x < Nx; x++) {
             if (x == 0) {
-                T[x][y] = interpolate(boundaryT[0], boundaryT[5], y, 24);
+                T[x][y] = interpolate(boundaryT[5], boundaryT[1], y, 24);
             }
             else if (x == Nx - 1) {
-                T[x][y] = interpolate(boundaryT[2], boundaryT[3], y, 24);
+                T[x][y] = interpolate(boundaryT[2], boundaryT[4], y, 24);
             }
             else if (y == 0 && (x < (Nx >> 1))) {
-                T[x][y] = interpolate(boundaryT[0], boundaryT[1], x, 32);
+                T[x][y] = interpolate(boundaryT[5], boundaryT[0], x, 32);
             }
             else if (y == 0) {
-                T[x][y] = interpolate(boundaryT[1], boundaryT[2], x - 16, 32);
+                T[x][y] = interpolate(boundaryT[0], boundaryT[2], x - 16, 32);
             }
             else if (y == Ny - 1 && (x < (Nx >> 1))) {
-                T[x][y] = interpolate(boundaryT[5], boundaryT[4], x, 32);
+                T[x][y] = interpolate(boundaryT[1], boundaryT[3], x, 32);
             }
             else if (y == Ny - 1){
-                T[x][y] = interpolate(boundaryT[4], boundaryT[3], x - 16, 32);
+                T[x][y] = interpolate(boundaryT[3], boundaryT[4], x - 16, 32);
             }
         }
     }
