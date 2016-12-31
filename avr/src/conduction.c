@@ -3,6 +3,7 @@
 #include <inttypes.h>
 
 #include "fixed.h"
+#include "interpolate.h"
 
 fixed_t T[Nx][Ny];
 fixed_t T_old[Nx];
@@ -54,16 +55,22 @@ void conduction_update_boundary(fixed_t *boundaryT)
     for (uint8_t y = 0; y < Ny; y++) {
         for (uint8_t x = 0; x < Nx; x++) {
             if (x == 0) {
-                T[x][y] = boundaryT[1];
+                T[x][y] = interpolate(boundaryT[0], boundaryT[5], y, 24);
             }
             else if (x == Nx - 1) {
-                T[x][y] = boundaryT[3];
+                T[x][y] = interpolate(boundaryT[2], boundaryT[3], y, 24);
+            }
+            else if (y == 0 && (x < (Nx >> 1))) {
+                T[x][y] = interpolate(boundaryT[0], boundaryT[1], x, 32);
             }
             else if (y == 0) {
-                T[x][y] = boundaryT[0];
+                T[x][y] = interpolate(boundaryT[1], boundaryT[2], x - 16, 32);
             }
-            else if (y == Ny - 1) {
-                T[x][y] = boundaryT[2];
+            else if (y == Ny - 1 && (x < (Nx >> 1))) {
+                T[x][y] = interpolate(boundaryT[5], boundaryT[4], x, 32);
+            }
+            else if (y == Ny - 1){
+                T[x][y] = interpolate(boundaryT[4], boundaryT[3], x - 16, 32);
             }
         }
     }

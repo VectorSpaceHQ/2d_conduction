@@ -26,8 +26,9 @@ rgb_matrix.c: rgb_matrix.h
 colormap.c: colormap.h fixed.h
 conduction.c: conduction.h fixed.h
 timer.c: timer.h
+interpolate.c: interpolate.h
 
-$(TARGET): main.c spi.c adc.c rgb_matrix.c colormap.c conduction.c timer.c startup/crt1/gcrt1.S
+$(TARGET): main.c spi.c adc.c rgb_matrix.c colormap.c conduction.c timer.c interpolate.c startup/crt1/gcrt1.S
 	$(CC) -mmcu=$(DEVICE) $(CFLAGS) $(INCLUDES) $^ -o $(TARGET)
 	avr-size $(TARGET)
 	avr-objcopy -O ihex -R .eeprom $(TARGET) $(TARGET).hex
