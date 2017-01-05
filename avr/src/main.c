@@ -32,7 +32,7 @@ int main()
         conduction_compute(1);
         update_leds();
 
-        while(timer_get_ticks() < (TIMER_TICKS_PER_SEC / 10));
+        while(timer_get_ticks() < (TIMER_TICKS_PER_SEC / 100));
     }
 
     return 0;
@@ -41,7 +41,7 @@ int main()
 void read_temperatures(fixed_t *boundaryT)
 {
     for (uint8_t i = 0; i < 6; i++) {
-        boundaryT[i] = ((adc_read(i) - 400) << 2) ;
+        boundaryT[i] = ((adc_read(i) - 400) << 3) ;
     }
 }
 
